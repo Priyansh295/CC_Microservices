@@ -1,0 +1,6 @@
+fastapi[all]>=0.100.0,<0.111.0  # FastAPI framework and common extras like uvicorn, pydantic
+sqlalchemy>=2.0.0,<2.1.0        # ORM for database interaction
+psycopg2-binary>=2.9.0,<2.10.0  # PostgreSQL driver (use psycopg2 for production)
+alembic>=1.11.0,<1.14.0        # Database migration tool
+python-dotenv>=1.0.0,<1.1.0    # For loading .env files
+pydantic-settings>=2.0.0,<2.3.0 # For handling settings/config via Pydantic

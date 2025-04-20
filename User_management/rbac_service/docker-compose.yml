@@ -1,0 +1,50 @@
+# docker-compose.yml (Updated)
+# version: '3.8' # Version key is optional in newer docker-compose
+
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: user       # Must match user in DATABASE_URL below
+      POSTGRES_PASSWORD: password # Must match password in DATABASE_URL below
+      POSTGRES_DB: rbac_db     # Must match db name in DATABASE_URL below
+    ports:
+      - "5432:5432"
+    networks:
+      - rbac_network
+    healthcheck: # Checks if PostgreSQL is ready to accept connections
+      test: ["CMD-SHELL", "pg_isready -U user -d rbac_db || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: . # Build the image from Dockerfile in the current directory (.)
+    volumes:
+      # Mount local app code into container for hot-reloading
+      # Changes in local ./app will reflect in the container's /app/app
+      - ./app:/app/app
+    ports:
+      - "8000:8000" # Map host port 8000 to container port 8000 (Uvicorn default)
+    networks:
+      - rbac_network
+    environment:
+      # Provide database URL to the app container
+      # IMPORTANT: Use 'db' as the hostname, as services can reach each other
+      # via service names on the same Docker network.
+      DATABASE_URL: postgresql://user:password@db:5432/rbac_db
+    depends_on:
+      db: # Wait for the db service...
+        condition: service_healthy # ...to pass its healthcheck before starting app
+    # Command to run migrations then start the app server
+    # Uses 'sh -c' to run multiple commands
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+
+networks:
+  rbac_network:
+    driver: bridge

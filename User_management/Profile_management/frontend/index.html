@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Profile Management</h1>
+
+    <div id="profile-details" style="display: none;">
+        <h2>Profile Details</h2>
+        <p><strong>User ID:</strong> <span id="display-user-id"></span></p>
+        <p><strong>First Name:</strong> <span id="display-first-name"></span></p>
+        <p><strong>Last Name:</strong> <span id="display-last-name"></span></p>
+        <p><strong>Date of Birth:</strong> <span id="display-date-of-birth"></span></p>
+        <p><strong>Phone Number:</strong> <span id="display-phone-number"></span></p>
+        <p><strong>Address:</strong> <span id="display-address"></span></p>
+        <p><strong>Major:</strong> <span id="display-major"></span></p>
+        <p><strong>Enrolled Courses:</strong> <span id="display-enrolled-courses"></span></p>
+        <p><strong>Academic Year:</strong> <span id="display-academic-year"></span></p>
+        <p><strong>Previous Education:</strong> <span id="display-previous-education"></span></p>
+    </div>
+
+    <div id="profile-form">
+        <h2>Create/Update Profile</h2>
+        <label for="user-id">User ID:</label>
+        <input type="text" id="user-id"><br><br>
+
+        <label for="first-name">First Name:</label>
+        <input type="text" id="first-name"><br><br>
+
+        <label for="last-name">Last Name:</label>
+        <input type="text" id="last-name"><br><br>
+
+        <label for="date-of-birth">Date of Birth:</label>
+        <input type="date" id="date-of-birth" name="date_of_birth"><br><br>
+
+        <label for="phone-number">Phone Number:</label>
+        <input type="text" id="phone-number"><br><br>
+
+        <label for="address">Address:</label>
+        <textarea id="address"></textarea><br><br>
+
+        <label for="major">Major:</label>
+        <input type="text" id="major"><br><br>
+
+        <label>Enrolled Courses:</label><br>
+        <div class="enrolled-courses-group">
+            <input type="checkbox" id="os" name="enrolled_courses" value="OS"> <label for="os">Operating Systems</label><br>
+            <input type="checkbox" id="dsa" name="enrolled_courses" value="DSA"> <label for="dsa">Data Structures and Algorithms</label><br>
+            <input type="checkbox" id="se" name="enrolled_courses" value="SE"> <label for="se">Software Engineering</label><br><br>
+        </div>
+
+        <label for="academic-year">Academic Year:</label>
+        <input type="text" id="academic-year" name="academic_year"><br><br>
+
+        <label for="previous-education">Previous Education:</label>
+        <textarea id="previous-education"></textarea><br><br>
+
+        <button onclick="getProfile()">Get Profile</button>
+        <button onclick="createOrUpdateProfile()">Create/Update Profile</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

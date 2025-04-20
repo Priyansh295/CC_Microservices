@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # Access Control Service
+  access-control:
+    build: ./access-control
+    container_name: access-control
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    networks:
+      - microservices-network
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - access-control-data:/app/data
+
+  # Vulnerability Scanner Service
+  vulnerability-scanner:
+    build: ./vulnerability-scanner
+    container_name: vulnerability-scanner
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    networks:
+      - microservices-network
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - vuln-scanner-data:/app/data
+
+  # Bug Monitoring Service
+  bug-monitoring:
+    build: ./bug-monitoring
+    container_name: bug-monitoring
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    networks:
+      - microservices-network
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - bug-monitoring-logs:/app/logs
+
+  # Data Encryption Service
+  data-encryption:
+    build: ./data-encryption
+    container_name: data-encryption
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    networks:
+      - microservices-network
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - encryption-keys:/app/keys
+
+  # NGINX Reverse Proxy
+  nginx:
+    build: ./nginx
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - access-control
+      - vulnerability-scanner
+      - bug-monitoring
+      - data-encryption
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  access-control-data:
+  vuln-scanner-data:
+  bug-monitoring-logs:
+  encryption-keys:

@@ -1,0 +1,16 @@
+{
+  "name": "microservices-integration-tests",
+  "version": "1.0.0",
+  "description": "Integration tests for microservices architecture",
+  "main": "integration-test.js",
+  "scripts": {
+    "test": "node integration-test.js",
+    "test:mock": "USE_MOCK_LOGIN=true node integration-test.js",
+    "test:real": "USE_MOCK_LOGIN=false node integration-test.js",
+    "test:retry": "MAX_RETRIES=5 RETRY_DELAY=10000 node integration-test.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "colors": "^1.4.0"
+  }
+} 

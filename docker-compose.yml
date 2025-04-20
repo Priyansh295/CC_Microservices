@@ -1,0 +1,253 @@
+version: '3.8'
+
+services:
+  # === SECURITY MICROSERVICES ===
+  
+  # Access Control Service
+  access-control:
+    build: ./Security/access-control
+    container_name: access-control
+    restart: unless-stopped
+    ports:
+      - "${ACCESS_CONTROL_EXTERNAL_PORT:-3001}:${ACCESS_CONTROL_PORT:-3001}"
+    networks:
+      - microservices-network
+    environment:
+      - NODE_ENV=production
+      - SERVICE_NAME=access-control
+      - SERVICE_PORT=${ACCESS_CONTROL_PORT:-3001}
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-http://authentication:3001}
+      - RBAC_SERVICE_URL=${RBAC_SERVICE_URL:-http://rbac-service:3001}
+      - USER_MANAGEMENT_URL=${USER_MANAGEMENT_URL:-http://authentication:3001}
+      - INTER_SERVICE_SECRET=${INTER_SERVICE_SECRET:-53c64083bf688b32180607d92f4d3245b005afd1f3b4938aa34d20a61613a008}
+    volumes:
+      - access-control-data:/app/data
+    depends_on:
+      - authentication
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${ACCESS_CONTROL_PORT:-3001}/health?quick=true"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Vulnerability Scanner Service
+  vulnerability-scanner:
+    build: ./Security/vulnerability-scanner
+    container_name: vulnerability-scanner
+    restart: unless-stopped
+    ports:
+      - "${VULNERABILITY_SCANNER_EXTERNAL_PORT:-3002}:${VULNERABILITY_SCANNER_PORT:-3002}"
+    networks:
+      - microservices-network
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_NAME=vulnerability-scanner
+      - PORT=${VULNERABILITY_SCANNER_PORT:-3002}
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-http://authentication:3001}
+      - RBAC_SERVICE_URL=${RBAC_SERVICE_URL:-http://rbac-service:3001}
+      - INTER_SERVICE_SECRET=${INTER_SERVICE_SECRET:-53c64083bf688b32180607d92f4d3245b005afd1f3b4938aa34d20a61613a008}
+    volumes:
+      - vuln-scanner-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${VULNERABILITY_SCANNER_PORT:-3002}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Bug Monitoring Service
+  bug-monitoring:
+    build: ./Security/bug-monitoring
+    container_name: bug-monitoring
+    restart: unless-stopped
+    ports:
+      - "${BUG_MONITORING_EXTERNAL_PORT:-3003}:${BUG_MONITORING_PORT:-3003}"
+    networks:
+      - microservices-network
+    environment:
+      - NODE_ENV=production
+      - SERVICE_NAME=bug-monitoring
+      - PORT=${BUG_MONITORING_PORT:-3003}
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-http://authentication:3001}
+      - RBAC_SERVICE_URL=${RBAC_SERVICE_URL:-http://rbac-service:3001}
+      - INTER_SERVICE_SECRET=${INTER_SERVICE_SECRET:-53c64083bf688b32180607d92f4d3245b005afd1f3b4938aa34d20a61613a008}
+    volumes:
+      - bug-monitoring-logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${BUG_MONITORING_PORT:-3003}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Data Encryption Service
+  data-encryption:
+    build: ./Security/data-encryption
+    container_name: data-encryption
+    restart: unless-stopped
+    ports:
+      - "${DATA_ENCRYPTION_EXTERNAL_PORT:-3004}:${DATA_ENCRYPTION_PORT:-3004}"
+    networks:
+      - microservices-network
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_NAME=data-encryption
+      - PORT=${DATA_ENCRYPTION_PORT:-3004}
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-http://authentication:3001}
+      - RBAC_SERVICE_URL=${RBAC_SERVICE_URL:-http://rbac-service:3001}
+      - INTER_SERVICE_SECRET=${INTER_SERVICE_SECRET:-53c64083bf688b32180607d92f4d3245b005afd1f3b4938aa34d20a61613a008}
+    volumes:
+      - encryption-keys:/app/keys
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${DATA_ENCRYPTION_PORT:-3004}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # === USER MANAGEMENT MICROSERVICES ===
+  
+  # Authentication Service Backend
+  authentication:
+    build: ./User_management/authentication/auth-microservice
+    container_name: authentication
+    restart: unless-stopped
+    ports:
+      - "${AUTHENTICATION_EXTERNAL_PORT:-3005}:${AUTHENTICATION_PORT:-3001}"
+    networks:
+      - microservices-network
+    environment:
+      - PORT=${AUTHENTICATION_PORT:-3001}
+      - SERVICE_NAME=authentication
+      - SUPABASE_URL=${SUPABASE_URL:-https://mabvshocptggarpjaznk.supabase.co}
+      - SUPABASE_KEY=${SUPABASE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hYnZzaG9jcHRnZ2FycGphem5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1NDg2NTYsImV4cCI6MjA2MDEyNDY1Nn0.TMtkUdLM-Dv1x57xFMqU7mxJ00w8Lltxx9BNArOJNmw}
+      - JWT_SECRET=${JWT_SECRET:-8dbcf2796fd4f3a0c6f41a2bd81337a09de6ea03339392329934b26a941439ca}
+      - TOKEN_EXPIRY=${TOKEN_EXPIRY:-86400}
+      - INTER_SERVICE_SECRET=${INTER_SERVICE_SECRET:-53c64083bf688b32180607d92f4d3245b005afd1f3b4938aa34d20a61613a008}
+      - RBAC_SERVICE_URL=${RBAC_SERVICE_URL:-http://rbac-service:3001}
+      - ACCESS_CONTROL_URL=${ACCESS_CONTROL_URL:-http://access-control:3001}
+      - DATA_ENCRYPTION_URL=${DATA_ENCRYPTION_URL:-http://data-encryption:3004}
+      - VULNERABILITY_SCANNER_URL=${VULNERABILITY_SCANNER_URL:-http://vulnerability-scanner:3002}
+      - BUG_MONITORING_URL=${BUG_MONITORING_URL:-http://bug-monitoring:3003}
+      - AUTH_DB=${SQLITE_AUTH_DB:-sqlite}
+      - NODE_ENV=${NODE_ENV:-production}
+    volumes:
+      - auth-data:/usr/src/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${AUTHENTICATION_PORT:-3001}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # RBAC Service
+  rbac-service:
+    build: ./User_management/rbac_service
+    container_name: rbac-service
+    restart: unless-stopped
+    ports:
+      - "${RBAC_EXTERNAL_PORT:-3006}:${RBAC_PORT:-3001}"
+    networks:
+      - microservices-network
+    environment:
+      - PORT=${RBAC_PORT:-3001}
+      - SERVICE_NAME=rbac-service
+      - DATABASE_URL=postgresql://${RBAC_DB_USER:-user}:${RBAC_DB_PASSWORD:-password}@${RBAC_DB_HOST:-rbac-db}:${RBAC_DB_PORT:-5432}/${RBAC_DB_NAME:-rbac_db}
+      - INTER_SERVICE_SECRET=${INTER_SERVICE_SECRET:-53c64083bf688b32180607d92f4d3245b005afd1f3b4938aa34d20a61613a008}
+      - AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-http://authentication:3001}
+      - ACCESS_CONTROL_URL=${ACCESS_CONTROL_URL:-http://access-control:3001}
+      - DATA_ENCRYPTION_URL=${DATA_ENCRYPTION_URL:-http://data-encryption:3004}
+      - VULNERABILITY_SCANNER_URL=${VULNERABILITY_SCANNER_URL:-http://vulnerability-scanner:3002}
+      - BUG_MONITORING_URL=${BUG_MONITORING_URL:-http://bug-monitoring:3003}
+    depends_on:
+      - rbac-db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${RBAC_PORT:-3001}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # RBAC Database
+  rbac-db:
+    image: postgres:13
+    container_name: rbac-db
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    environment:
+      - POSTGRES_USER=${RBAC_DB_USER:-user}
+      - POSTGRES_PASSWORD=${RBAC_DB_PASSWORD:-password}
+      - POSTGRES_DB=${RBAC_DB_NAME:-rbac_db}
+    volumes:
+      - rbac-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${RBAC_DB_USER:-user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Authentication Service Frontend
+  auth-frontend:
+    build:
+      context: ./User_management/authentication/auth-microservice/auth-frontend
+      args:
+        - REACT_APP_AUTH_API_URL=http://localhost/api/auth
+        - REACT_APP_RBAC_API_URL=http://localhost/api/rbac
+        - REACT_APP_ACCESS_CONTROL_API_URL=http://localhost/api/access-control
+        - REACT_APP_DATA_ENCRYPTION_API_URL=http://localhost/api/data-encryption
+        - REACT_APP_VULNERABILITY_SCANNER_API_URL=http://localhost/api/vulnerability-scanner
+        - REACT_APP_BUG_MONITORING_API_URL=http://localhost/api/bug-monitoring
+    container_name: auth-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"  # NGINX serves on port 80 inside container, expose on 8080 externally
+    networks:
+      - microservices-network
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - authentication
+      - rbac-service
+      - nginx
+
+  # NGINX Reverse Proxy
+  nginx:
+    build: ./Security/nginx
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - access-control
+      - vulnerability-scanner
+      - bug-monitoring
+      - data-encryption
+      - authentication
+      - rbac-service
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  microservices-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  access-control-data:
+  vuln-scanner-data:
+  bug-monitoring-logs:
+  encryption-keys:
+  auth-data:
+  rbac-db-data: 

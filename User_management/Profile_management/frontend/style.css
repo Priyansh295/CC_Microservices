@@ -1,0 +1,117 @@
+body {
+    font-family: 'Arial', sans-serif; /* A more common and readable font */
+    margin: 40px;
+    background-color: #f4f6f8; /* Light background */
+    color: #333;
+    line-height: 1.6;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #007bff; /* Primary color */
+    margin-bottom: 30px;
+}
+
+#profile-details {
+    margin-top: 30px;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+#profile-details h2 {
+    color: #28a745; /* Success color */
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+#profile-details p {
+    margin-bottom: 15px;
+}
+
+#profile-details strong {
+    font-weight: bold;
+    color: #555;
+    margin-right: 10px;
+}
+
+#profile-form {
+    background-color: #fff;
+    padding: 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#profile-form h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+#profile-form label {
+    display: inline-block;
+    width: 200px;
+    text-align: right;
+    margin-right: 15px;
+    margin-bottom: 12px;
+    font-weight: bold;
+    color: #666;
+}
+
+#profile-form input[type="text"],
+#profile-form input[type="date"],
+#profile-form textarea {
+    width: 350px;
+    padding: 10px;
+    margin-bottom: 18px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+#profile-form textarea {
+    height: 100px;
+}
+
+#profile-form button {
+    padding: 12px 30px;
+    margin-right: 15px;
+    border: none;
+    border-radius: 6px;
+    background-color: #007bff; /* Primary color */
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+#profile-form button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Style for enrolled courses checkboxes */
+#profile-form .enrolled-courses-group {
+    margin-left: 215px; /* Align with input fields */
+    margin-bottom: 15px;
+}
+
+#profile-form .enrolled-courses-group label {
+    font-weight: normal;
+    width: auto;
+    text-align: left;
+    margin-left: 5px;
+    color: #555;
+}
+
+#profile-form .enrolled-courses-group input[type="checkbox"] {
+    margin-right: 8px;
+    vertical-align: middle;
+}

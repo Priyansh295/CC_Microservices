@@ -1,0 +1,14 @@
+{
+  "name": "auth-security-integration-test",
+  "version": "1.0.0",
+  "description": "Test script to verify integration between authentication and security services",
+  "main": "auth-security-test.js",
+  "scripts": {
+    "test": "node auth-security-test.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "axios": "^1.8.4",
+    "bcryptjs": "^3.0.2"
+  }
+}

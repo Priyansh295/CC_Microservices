@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    pre { background-color: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    button { margin: 5px; padding: 8px 16px; cursor: pointer; }
+    .result { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>API Test Page</h1>
+  
+  <div>
+    <h2>Auth Service</h2>
+    <button onclick="testAPI('/api/auth/health')">Test Auth Health</button>
+    <button onclick="testAPI('/api/auth/api/check-db-connection')">Test DB Connection</button>
+    <div id="auth-result" class="result">
+      <pre>Results will appear here...</pre>
+    </div>
+  </div>
+
+  <div>
+    <h2>RBAC Service</h2>
+    <button onclick="testAPI('/api/rbac/api/v1/roles')">Test RBAC Roles</button>
+    <div id="rbac-result" class="result">
+      <pre>Results will appear here...</pre>
+    </div>
+  </div>
+
+  <div>
+    <h2>Security Services</h2>
+    <button onclick="testAPI('/api/access-control/health')">Test Access Control</button>
+    <button onclick="testAPI('/api/vulnerability-scanner/health')">Test Vulnerability Scanner</button>
+    <button onclick="testAPI('/api/bug-monitoring/health')">Test Bug Monitoring</button>
+    <button onclick="testAPI('/api/data-encryption/health')">Test Data Encryption</button>
+    <div id="security-result" class="result">
+      <pre>Results will appear here...</pre>
+    </div>
+  </div>
+
+  <div>
+    <h2>Static Resources</h2>
+    <button onclick="testStaticResource('/auth/static/js/main.2341836a.js')">Test JS File</button>
+    <button onclick="testStaticResource('/auth/static/css/main.b101c410.css')">Test CSS File</button>
+    <div id="static-result" class="result">
+      <pre>Results will appear here...</pre>
+    </div>
+  </div>
+
+  <div>
+    <h2>Console Errors</h2>
+    <p>Open your browser developer console (F12) to see any errors from the auth frontend.</p>
+    <button onclick="window.open('/auth/', '_blank')">Open Auth Frontend in New Tab</button>
+  </div>
+
+  <script>
+    async function testAPI(endpoint) {
+      let resultElement;
+      
+      if (endpoint.includes('/api/auth/')) {
+        resultElement = document.getElementById('auth-result');
+      } else if (endpoint.includes('/api/rbac/')) {
+        resultElement = document.getElementById('rbac-result');
+      } else {
+        resultElement = document.getElementById('security-result');
+      }
+      
+      resultElement.innerHTML = '<pre>Loading...</pre>';
+      
+      try {
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        resultElement.innerHTML = `<pre>Status: ${response.status}\nData: ${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        resultElement.innerHTML = `<pre>Error: ${error.message}</pre>`;
+      }
+    }
+
+    async function testStaticResource(url) {
+      const resultElement = document.getElementById('static-result');
+      resultElement.innerHTML = '<pre>Loading...</pre>';
+      
+      try {
+        const response = await fetch(url);
+        const status = response.status;
+        const contentType = response.headers.get('Content-Type');
+        const size = response.headers.get('Content-Length');
+        
+        resultElement.innerHTML = `<pre>Status: ${status}
+Content-Type: ${contentType}
+Size: ${size} bytes
+URL: ${url}</pre>`;
+      } catch (error) {
+        resultElement.innerHTML = `<pre>Error: ${error.message}</pre>`;
+      }
+    }
+  </script>
+</body>
+</html> 

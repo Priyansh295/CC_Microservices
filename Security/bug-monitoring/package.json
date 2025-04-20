@@ -1,0 +1,16 @@
+{
+  "name": "bug-monitoring",
+  "version": "1.0.0",
+  "description": "Bug Monitoring Microservice",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "cors": "^2.8.5",
+    "axios": "^0.24.0",
+    "body-parser": "^1.19.0",
+    "morgan": "^1.10.0"
+  }
+}
