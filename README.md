@@ -75,7 +75,7 @@ The integration has been completed with the following components working:
 6. To check service health and connectivity:
    ```
    cd Tools/Scripts
-   ./check-services.ps1
+   ./security-microservices-demo.ps1
    ```
 
 ## Accessing the Services
